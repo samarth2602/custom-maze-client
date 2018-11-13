@@ -1,0 +1,63 @@
+.white-grid-1 {
+    height: 30px;
+    width: 30px;
+    border: 0.5px solid #d1d1d1 ;
+}
+.green-grid-1{
+    height: 30px;
+    width: 30px;
+    background-color: green;
+}
+.red-grid-1{
+    height: 30px;
+    width: 30px;
+    background-color: red;
+}
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: scroll;
+    min-width: 320px;
+    background: #fff;
+    font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+    font-size: 14px;
+    line-height: 1.4285em;
+    color: rgba(0,0,0,.87);
+}
+.fa {
+    line-height: 1.57142857;
+    font-size: 30px;
+}
+.black-grid-1 {
+    height: 30px;
+    width: 30px;
+    background: #3b3838;
+    border: 0.5px solid #3b3838;
+}
+.block{
+    position: fixed;
+    width: "100px";
+    height: "100px";
+    top: 13%;
+    left: 85%;
+    padding: 20px;
+    background-color: rgba(74,189,172, 0.95);
+    color: whitesmoke;
+    border-radius: 8px;
+    box-shadow: 5px 5px 10px rgba(143, 123, 123, 0.5);
+    cursor: default;
+}
+.white-grid-1:hover {
+    background: blanchedalmond;
+    border: 1px dotted rgba(0, 0, 0, 0.397) ;
+}
+
+.testimonial-group > .row {
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+.testimonial-group > .row > .col{
+    display: inline-block;
+    float: none;
+}
