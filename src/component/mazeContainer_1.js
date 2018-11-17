@@ -24,7 +24,8 @@ class Mazecontainer_1 extends Component {
       heap: [] ,
       maze: [] ,
       selected_algo: 1 ,
-      running: false
+      running: false ,
+      best_algo: ''
     };
 }
 
@@ -104,6 +105,7 @@ class Mazecontainer_1 extends Component {
         }
   
     }
+
     handleMouseDown(e) {
         if(e.target.className === "white-grid-1")
             this.setState({drag: true, w: true , b: false});
@@ -177,8 +179,9 @@ class Mazecontainer_1 extends Component {
         }).then((res) => {
             return res.json();
         }).then((json) => {
-            console.log("Here");
             console.log(json);
+            document.getElementById("suggetion_box").style.display = "block";
+            this.setState({best_algo: json.ans})
         });
         console.log(this.state.selected_algo);
         if(this.state.start) {
@@ -514,6 +517,11 @@ class Mazecontainer_1 extends Component {
             
            
            </Draggable>
+
+            <div id = "suggetion_box" style = {{position : "fixed" , height : "26px" , width : "280px" , top : "13%" , left : "5%" , backgroundColor : "rgba(0, 0, 0, 0.2)" , color : "green" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
+                Best Algorithm for Maze: {this.state.best_algo}
+            </div>
+
             <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "90%" , backgroundColor : "rgba(135, 219, 61, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickStart.bind(this)}>
                 Start
             </div>
