@@ -176,7 +176,7 @@ class Mazecontainer_1 extends Component {
             start : this.state.start ,
             end : this.state.end
         }
-        fetch('/api/get_best_algo' , {
+        fetch('api/get_best_algo' , {
             method: 'POST' ,
             body: JSON.stringify(payLoad) ,
             headers: {
@@ -537,7 +537,7 @@ class Mazecontainer_1 extends Component {
             <div id = "suggetion_box" style = {{position : "fixed" , height : "26px" , width : "280px" , top : "13%" , left : "5%" , backgroundColor : "rgba(0, 0, 0, 0.2)" , color : "green" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
                 Best Algorithm for Maze: {this.state.best_algo}
             </div>
-
+            
             <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "90%" , backgroundColor : "rgba(135, 219, 61, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickStart.bind(this)}>
                 Start
             </div>
@@ -596,6 +596,21 @@ class Mazecontainer_1 extends Component {
                         <input type="radio" id="best" name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
                         <span>Best-First-Search</span>
                     </label>
+                </div>
+                <div className="md-radio md-primary">
+                    <label>
+                        <input type="radio" id="q-learning" name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
+                        <span>Q-Learning</span>
+                    </label>
+                    <input
+                          style={{margin: "15px"}}
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter x of starting here..."
+                          required
+                          
+                        />
+                    
                 </div>
                 <p className="mb15">Custom Maze</p>
                 <div className="md-radio md-primary">
