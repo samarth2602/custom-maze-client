@@ -12,8 +12,8 @@ class Mazecontainer_1 extends Component {
       matrix: {} ,
       startClicked: 0 ,
       endClicked: 0,
-      start: {x: 0 , y: 0} ,
-      end: {x: 0 , y: 0} ,
+      start: {} ,
+      end: {} ,
       stack: [] ,
       visited: {} ,
       drag: false,
@@ -39,7 +39,7 @@ class Mazecontainer_1 extends Component {
             var temp = [];
             var temp_mat = [];
             for(var j = 0 ; j < 100 ; j++) {
-                temp.push(<div id={i+"_"+j} key={c} className="col" className="white-grid-1" onClick={this.Change_color.bind(this)}  onMouseDown={this.handleMouseDown.bind(this) }  onMouseUp={this.handleMouseUp.bind(this)}  onMouseMove={this.handleMouseMove.bind(this)}/>);
+                temp.push(<div id={i+"_"+j} key={c} className="col" className="white-grid-1" onMouseDown={this.handleMouseDown.bind(this) }  onMouseUp={this.handleMouseUp.bind(this)}  onMouseMove={this.handleMouseMove.bind(this)} onClick={this.Change_color.bind(this)}/>);
                 temp_mat.push(0);
                 c++;
             }
@@ -69,60 +69,6 @@ class Mazecontainer_1 extends Component {
         console.log(this.state.maze);
     }
 
-    handleMouseMove(event)
-    {
-        if(this.state.drag&&this.state.w)
-        {
-            var th = this.fo(event.target.id);
-            var mat = this.state.matrix;
-            event.target.className = "black-grid-1";
-            mat[th.x][th.y] = 1;
-            if(this.state.startClicked === 1) {
-                event.target.className="green-grid-1";
-               this.setState({startClicked: 0 , start: th})
-            }
-            if(this.state.endClicked === 1) {
-                event.target.style.className = "red-grid-1";
-               this.setState({endClicked: 0 , end: th});
-            }
-            this.setState({matrix: mat});
-        }
-        if(this.state.drag&&this.state.b)
-        {
-            var th = this.fo(event.target.id);
-            var mat = this.state.matrix;
-            event.target.className = "white-grid-1";
-            mat[th.x][th.y] = 0;
-            if(this.state.startClicked === 1) {
-               event.target.style.backgroundColor = "green";
-               this.setState({startClicked: 0 , start: th})
-            }
-            if(this.state.endClicked === 1) {
-               event.target.style.backgroundColor = "red";
-               this.setState({endClicked: 0 , end: th});
-            }
-            this.setState({matrix: mat});
-        }
-  
-    }
-
-    handleMouseDown(e) {
-        if(e.target.className === "white-grid-1")
-            this.setState({drag: true, w: true , b: false});
-        else
-            this.setState({drag: true, w: false , b: true});
-    }
-
-    handleMouseUp(e) {
-        this.setState({drag: false});
-    }
-
-    fo(a) {
-        var arr = a.split("_");
-        var ret = {x : parseInt(arr[0]) , y : parseInt(arr[1])};
-        return ret;
-    }
-
     Change_color(event) {
         var th = this.fo(event.target.id);
         var mat = this.state.matrix;
@@ -148,23 +94,83 @@ class Mazecontainer_1 extends Component {
         console.log(this.state.start);
         console.log(this.state.end);
     }
+    handleMouseMove(event)
+    {
+       
+        if(this.state.drag&&this.state.w)
+        {
+            var th = this.fo(event.target.id);
+            var mat = this.state.matrix;
+            event.target.className = "black-grid-1";
+            mat[th.x][th.y] = 1;
+            /*if(this.state.startClicked === 1) {
+                event.target.className="green-grid-1";
+                console.log("Hii");
+               this.setState({startClicked: 0 , start: th})
+            }
+            if(this.state.endClicked === 1) {
+                event.target.className = "red-grid-1";
+                console.log("Hii");
+               this.setState({endClicked: 0 , end: th});
+            }*/
+            this.setState({matrix: mat});
+        }
+        if(this.state.drag&&this.state.b)
+        {
+            var th = this.fo(event.target.id);
+            var mat = this.state.matrix;
+            event.target.className = "white-grid-1";
+            mat[th.x][th.y] = 0;
+            /*if(this.state.startClicked === 1) {
+                event.target.className="green-grid-1";
+               this.setState({startClicked: 0 , start: th})
+            }
+            if(this.state.endClicked === 1) {
+                event.target.className = "red-grid-1";
+                this.setState({endClicked: 0 , end: th});
+            }*/
+            this.setState({matrix: mat});
+        }
+        
+       
+    }
+
+    handleMouseDown(e) {
+        if(e.target.className === "white-grid-1")
+            this.setState({drag: true, w: true , b: false});
+        else
+            this.setState({drag: true, w: false , b: true});
+    }
+
+    handleMouseUp(e) {
+        this.setState({drag: false});
+    }
+
+    fo(a) {
+        var arr = a.split("_");
+        var ret = {x : parseInt(arr[0]) , y : parseInt(arr[1])};
+        return ret;
+    }
 
     onClickStart() {
-
+        if(this.state.start.x&&this.state.start.y)
+        {
         var x = document.getElementById(this.state.start.x + "_" + this.state.start.y);
-        x.style.backgroundColor = "white";
-        this.setState({startClicked: 1 , endClicked: 0});
+        x.className = "white-grid-1";
+        }
+        this.setState({startClicked: 1,endClicked: 0})
     }
 
     onClickEnd() {
-        if(x) {
+        if(this.state.end.x&&this.state.end.y) {
             var x = document.getElementById(this.state.end.x + "_" + this.state.end.y);
-            x.className = "black-grid-1";
+            x.className = "white-grid-1";
         }
-        this.setState({endClicked: 1 , startClicked: 0});
+        this.setState({startClicked: 0,endClicked: 1})
     }
 
     handlerGo() {
+        
         const payLoad = {
             matrix : this.state.matrix ,
             start : this.state.start ,
@@ -183,6 +189,7 @@ class Mazecontainer_1 extends Component {
             document.getElementById("suggetion_box").style.display = "block";
             this.setState({best_algo: json.ans})
         });
+        
         console.log(this.state.selected_algo);
         if(this.state.start) {
             if(this.state.selected_algo == "dfs")
@@ -350,6 +357,16 @@ class Mazecontainer_1 extends Component {
     handleAlgorithm(e)
     {
         this.state.selected_algo = e.target.id;
+        for(var i=1;i<99;i++)
+        {
+            for(var j=1;j<99;j++)
+            {
+            if(document.getElementById(i+"_"+j).className==="green-grid-1"||document.getElementById(i+"_"+j).className==="red-grid-1")
+            document.getElementById(i+"_"+j).className="white-grid-1"
+            }
+        }
+        document.getElementById(this.state.start.x+"_"+this.state.start.y).className="green-grid-1"
+        document.getElementById(this.state.end.x+"_"+this.state.end.y).className="red-grid-1"
     }
 
 
@@ -470,7 +487,147 @@ class Mazecontainer_1 extends Component {
             this.setState({matrix: this.state.matrix,start: {x: 2,y: 10}, end: {x: 60,y: 70}})
      
         }
-        if(e.target.id==='G')
+        if(e.target.id==='meet')
+        {
+            const temp="*.******************.*...............**.*.***.*.**********...*...*.........**.***.*********.*.**.*...*.......*.*.**.*****.*****.***.**...*.......*.*...****.*.*****.*.*.*.**...*.*...*.*.*.*.****.*.*.*.*.*.*.*.**...*...*.*.*...*.**.*******.**********.......*.*.......******.*.*.*.*****.**...*.*.*...*...*.**.***.*.*****.*.*.**.....*.......*....*******************";
+            var c=0;
+            for(var i=1;i<20;i++)
+            {
+                for(var j=15;j<34;j++)
+                {
+                    if(temp[c]==="*")
+                    {
+                       this.state.matrix[i][j]=1;
+                       document.getElementById(i+"_"+j).className="black-grid-1";
+                    }
+                    else
+                    {
+                        this.state.matrix[i][j]=0;
+                        document.getElementById(i+"_"+j).className="white-grid-1";
+                    }
+                    c++;
+                }
+            }
+          
+            document.getElementById(1+"_"+16).className="green-grid-1"
+            document.getElementById(18+"_"+33).className="red-grid-1"
+            console.log(this.state.matrix);
+            this.setState({matrix: this.state.matrix,start: {x: 1,y: 16},end: {x: 18,y: 33}})
+     
+        }
+        if(e.target.id==='classic1')
+        {
+            const temp="************.****************************..****************************.***************************.....***********************...****..*******************...*******...*****************.***.***.***.*****************.***********.*************.***..***...***..*************..***...*****...*******.*******.*****...**..****......*******..******.**.****..*************.****...**...**.**************.*....******....**************...************...************.****************.************..**************..*************...**********...****************....*.......*********************.********************";
+            var c=0;
+            for(var i=1;i<21;i++)
+            {
+                for(var j=10;j<40;j++)
+                {
+                    if(temp[c]==="*")
+                    {
+                       this.state.matrix[i][j]=1;
+                       document.getElementById(i+"_"+j).className="black-grid-1";
+                    }
+                    else
+                    {
+                        this.state.matrix[i][j]=0;
+                        document.getElementById(i+"_"+j).className="white-grid-1";
+                    }
+                    c++;
+                }
+            }
+          
+            document.getElementById(1+"_"+22).className="green-grid-1"
+            document.getElementById(20+"_"+19).className="red-grid-1"
+            console.log(this.state.matrix);
+            this.setState({matrix: this.state.matrix,start: {x: 1,y: 22},end: {x: 20,y: 19}})
+     
+        }
+        if(e.target.id==='b1')
+        {
+            const temp="*************************************....********....***...*******..**.*******..**..*..********..*****..***..****...*********.**....*..**.*******.*********.**.**.**.**.*******.********..**.**.**.**.*******.********.***.**.**.**.*******...******.***.**.**.**.*******.*.******.***.**.**.**.*******.*.******.***.**.**.**...*****.*.******.***.**.**.**.*..****.*.******.***.**.**.**.**.****.*.******.***.**.**.**.**.****.*.******.***.**.**.**.**.****.*.******.***.**.**.**.**.****.*..*****.***.**.**.**.**.****.**.****..**..**.**.**.**.****.**.****.***.***.**.**.**.****.**.****.***.***.**.**.**.****.**.****.***.***.**....**.****.**.****.***.***.*****.**.****.**.****.***.***.**....**..***.*******.***.***.**.**.***.***.**.****.***.***.**.**.***.***.**.****.***.***.**.**.***.***.**.****.***.***.**.**.***.***.**.****.**..***.**.**.***.***.**.****.*..****.**.**.***.***.**.****...*****.**.**.***.***.**.****.*******.**.**.*******.**.****.*******.*..**.***.***.**.****.*******...***.**..***.**.****.**....*.***.*.**.****.**.***..**.**.*.***.*.**.****.**.***.***.**.*.***.*.**.****.**.***.***.**.*.***.*.**.****.**.***.***.**.*.***.*.*..****.**.***.***.**.*.***.*.*.*****.*..***.***.**.*.***.*.*.*****...****.***.**.*.***.*.*.*****.******.***.**.*..*..*.*.*****.*****..***.**.**...**.*.*****.*****.**...**.**.****.*.*****.*****....****.**.****...*****.*****.*******.**.****.*******.*****.*******..*.**.....*****.*****.********.***..***...***..****.********.*...******...**..***.......***********************.*****.....................***.*************************.**";
+            var c=0;
+            for(var i=1;i<53;i++)
+            {
+                for(var j=8;j<38;j++)
+                {
+                    if(temp[c]==="*")
+                    {
+                       this.state.matrix[i][j]=1;
+                       document.getElementById(i+"_"+j).className="black-grid-1";
+                    }
+                    else
+                    {
+                        this.state.matrix[i][j]=0;
+                        document.getElementById(i+"_"+j).className="white-grid-1";
+                    }
+                    c++;
+                }
+            }
+          
+            document.getElementById(52+"_"+9).className="green-grid-1"
+            document.getElementById(52+"_"+35).className="red-grid-1"
+            console.log(this.state.matrix);
+            this.setState({matrix: this.state.matrix,start: {x: 52,y: 9},end: {x: 52,y: 35}})
+     
+        }
+        if(e.target.id==='v1')
+        {
+            const temp="***********************.*************************************************..*************************************************..*************************************************..*************************************************..............*************************************************..*************************...................*****..*********************....*****************...****..*****************....****............******..****..**************...****....**********....****....**..*************.******.*******....*****....****.***..************.******.....******.....****.****.****..***********...********.....******......****.*****.*************.....********.....**********...*****.*****************.....********.....***....*****...*********************....*********.....******...**************************.....*************....*****************************.**....*******....********************************.*****.........***********************************.***************************";
+            var c=0;
+            for(var i=1;i<21;i++)
+            {
+                for(var j=5;j<55;j++)
+                {
+                    if(temp[c]==="*")
+                    {
+                       this.state.matrix[i][j]=1;
+                       document.getElementById(i+"_"+j).className="black-grid-1";
+                    }
+                    else
+                    {
+                        this.state.matrix[i][j]=0;
+                        document.getElementById(i+"_"+j).className="white-grid-1";
+                    }
+                    c++;
+                }
+            }
+          
+            document.getElementById(1+"_"+27).className="green-grid-1"
+            document.getElementById(20+"_"+27).className="red-grid-1"
+            console.log(this.state.matrix);
+            this.setState({matrix: this.state.matrix,start: {x: 1,y: 27},end: {x: 20,y: 27}})
+     
+        }
+        if(e.target.id==='l1')
+        {
+            const temp="**.*******************.****............***......*****.********.*********.......**..*********.*********....******.***.********......*.***.*****....****.*.....*****.***.....*****...*********************";
+            var c=0;
+            for(var i=1;i<11;i++)
+            {
+                for(var j=15;j<35;j++)
+                {
+                    if(temp[c]==="*")
+                    {
+                       this.state.matrix[i][j]=1;
+                       document.getElementById(i+"_"+j).className="black-grid-1";
+                    }
+                    else
+                    {
+                        this.state.matrix[i][j]=0;
+                        document.getElementById(i+"_"+j).className="white-grid-1";
+                    }
+                    c++;
+                }
+            }
+          
+            document.getElementById(1+"_"+17).className="green-grid-1"
+            document.getElementById(7+"_"+33).className="red-grid-1"
+            console.log(this.state.matrix);
+            this.setState({matrix: this.state.matrix,start: {x: 1,y: 17},end: {x: 7,y: 33}})
+     
+        }
+        if(e.target.id==='g1')
         {
             const temp="***.**.****************....***************..****.........****..****..*******.****.****..********...**.****.***********.**.****........***..**.**************..***................***********************";
             var c=0;
@@ -501,18 +658,18 @@ class Mazecontainer_1 extends Component {
     }
 
     render() {
-
-        console.log(this.state.tsp);
+        console.log(this.state.startClicked+" "+this.state.endClicked);
         return (
           <div style={{paddingTop: "50px",paddingLeft: "10px"}}>
               {this.state.maze.map(it => {
                   return it;
               })}
               <Draggable>
-            {this.state.running?(<div style = {{position : "fixed"   , top : "80%" ,borderRadius : "50px",backgroundColor : "white",color : "red", left : "50%" , pointerEvents: "none"}} onClick={this.handlerGo.bind(this)} disable={true}>
-              <i class="fas fa-running fa-8x"></i>
-            </div>):(<div style = {{position : "fixed"   , top : "80%" ,borderRadius : "50px",backgroundColor : "white",color : "rgba(135, 219, 61, 0.9)", left : "50%"}} onClick={this.handlerGo.bind(this)}>
-              <i className="fas fa-play-circle  fa-8x" ></i>
+            {this.state.running?(<div style = {{position : "fixed"   , top : "87%" ,borderRadius : "50px",backgroundColor : "white",color : "red", left : "50%" , pointerEvents: "none"}} onClick={this.handlerGo.bind(this)} disable={true}>
+
+              <img src="https://media.giphy.com/media/VNzswn7BmdE7m/giphy.gif" width="60px" height="60px"/>
+            </div>):(<div style = {{position : "fixed"   , top : "87%" ,borderRadius : "50px",backgroundColor : "white",color : "rgba(135, 219, 61, 0.9)", left : "50%"}} onClick={this.handlerGo.bind(this)}>
+              <i className="fas fa-play-circle  fa-5x" ></i>
             </div>)}      
             
            
@@ -596,7 +753,37 @@ class Mazecontainer_1 extends Component {
                 </div>
                 <div className="md-radio md-primary">
                     <label>
-                        <input type="radio" id="G" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
+                        <input type="radio" id="meet" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
+                        <span>Meet's Maze</span>
+                    </label>
+                </div>
+                <div className="md-radio md-primary">
+                    <label>
+                        <input type="radio" id="classic1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
+                        <span>Classic Maze</span>
+                    </label>
+                </div>
+                <div className="md-radio md-primary">
+                    <label>
+                        <input type="radio" id="b1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
+                        <span>Bird's eye Maze</span>
+                    </label>
+                </div>
+                <div className="md-radio md-primary">
+                    <label>
+                        <input type="radio" id="v1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
+                        <span>Vortex Maze</span>
+                    </label>
+                </div>
+                <div className="md-radio md-primary">
+                    <label>
+                        <input type="radio" id="l1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
+                        <span>Little Maze</span>
+                    </label>
+                </div>
+                <div className="md-radio md-primary">
+                    <label>
+                        <input type="radio" id="g1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
                         <span>G's Maze</span>
                     </label>
                 </div>
