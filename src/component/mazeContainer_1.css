@@ -36,11 +36,12 @@ body {
 }
 .block{
     position: fixed;
-    width: "100px";
+    width: "10px";
     height: "100px";
-    top: 13%;
+    top: 10%;
     left: 85%;
-    padding: 20px;
+    margin-right: 8px;
+    padding: 30px;
     background-color: rgba(74,189,172, 0.95);
     color: whitesmoke;
     border-radius: 8px;
