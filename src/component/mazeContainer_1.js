@@ -170,7 +170,17 @@ class Mazecontainer_1 extends Component {
     }
 
     handlerGo() {
-        
+       
+        for(var i=1;i<99;i++)
+        {
+            for(var j=1;j<99;j++)
+            {
+            if(document.getElementById(i+"_"+j).className==="green-grid-1"||document.getElementById(i+"_"+j).className==="red-grid-1")
+            document.getElementById(i+"_"+j).className="white-grid-1"
+            }
+        }
+        document.getElementById(this.state.start.x+"_"+this.state.start.y).className="green-grid-1"
+        document.getElementById(this.state.end.x+"_"+this.state.end.y).className="red-grid-1"
         const payLoad = {
             matrix : this.state.matrix ,
             start : this.state.start ,
@@ -200,6 +210,8 @@ class Mazecontainer_1 extends Component {
                 this.Astar(1);
             if(this.state.selected_algo == "djkstra")
                 this.dijikstra();
+            if(this.state.selected_algo == "q-learning")
+                this.dijikstra();   
         }
     }
 
@@ -365,8 +377,11 @@ class Mazecontainer_1 extends Component {
             document.getElementById(i+"_"+j).className="white-grid-1"
             }
         }
+        if(this.state.start.x)
+        {
         document.getElementById(this.state.start.x+"_"+this.state.start.y).className="green-grid-1"
         document.getElementById(this.state.end.x+"_"+this.state.end.y).className="red-grid-1"
+        }
     }
 
 
@@ -679,13 +694,13 @@ class Mazecontainer_1 extends Component {
                 Best Algorithm for Maze: {this.state.best_algo}
             </div>
             
-            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "90%" , backgroundColor : "rgba(135, 219, 61, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickStart.bind(this)}>
+            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "80%" , backgroundColor : "rgba(135, 219, 61, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickStart.bind(this)}>
                 Start
             </div>
-            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "95%" , backgroundColor : "rgba(209, 125, 51, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickEnd.bind(this)}>
+            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "75%" , backgroundColor : "rgba(209, 125, 51, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickEnd.bind(this)}>
                 End
             </div>
-            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "85%" , backgroundColor : "red" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.handleClear.bind(this)}>
+            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "70%" , backgroundColor : "red" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.handleClear.bind(this)}>
                 Clear
             </div>
             <div style = {{position : "fixed" ,top: "90%" ,right: "88%"}}>
@@ -701,6 +716,7 @@ class Mazecontainer_1 extends Component {
             
             <Draggable>
             <div className="block">
+            
                 <p className="mb15">Select Algorithm</p>
                 <div className="md-radio md-primary">
                     <label>
@@ -728,18 +744,6 @@ class Mazecontainer_1 extends Component {
                 </div>
                 <div className="md-radio md-primary">
                     <label>
-                        <input type="radio" id="ida" name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
-                        <span>IDA*</span>
-                    </label>
-                </div>
-                <div className="md-radio md-primary">
-                    <label>
-                        <input type="radio" id="best" name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
-                        <span>Best-First-Search</span>
-                    </label>
-                </div>
-                <div className="md-radio md-primary">
-                    <label>
                         <input type="radio" id="q-learning" name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
                         <span>Q-Learning</span>
                     </label>
@@ -747,10 +751,9 @@ class Mazecontainer_1 extends Component {
                           style={{margin: "15px"}}
                           type="text"
                           className="form-control"
-                          placeholder="Enter x of starting here..."
+                          placeholder="Iteration"
                           required
-                          
-                        />
+                          />
                     
                 </div>
                 <p className="mb15">Custom Maze</p>
