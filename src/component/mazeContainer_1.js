@@ -24,7 +24,8 @@ class Mazecontainer_1 extends Component {
       heap: [] ,
       maze: [] ,
       selected_algo: 1 ,
-      running: false
+      running: false ,
+      best_algo: ''
     };
 }
 
@@ -133,6 +134,7 @@ class Mazecontainer_1 extends Component {
         
        
     }
+
     handleMouseDown(e) {
         if(e.target.className === "white-grid-1")
             this.setState({drag: true, w: true , b: false});
@@ -170,7 +172,9 @@ class Mazecontainer_1 extends Component {
     handlerGo() {
         
         const payLoad = {
-            matrix : this.state.matrix
+            matrix : this.state.matrix ,
+            start : this.state.start ,
+            end : this.state.end
         }
         fetch('/api/get_best_algo' , {
             method: 'POST' ,
@@ -182,6 +186,8 @@ class Mazecontainer_1 extends Component {
             return res.json();
         }).then((json) => {
             console.log(json);
+            document.getElementById("suggetion_box").style.display = "block";
+            this.setState({best_algo: json.ans})
         });
         
         console.log(this.state.selected_algo);
@@ -192,6 +198,8 @@ class Mazecontainer_1 extends Component {
                 this.Astar(0);
             if(this.state.selected_algo == "A-euclid")
                 this.Astar(1);
+            if(this.state.selected_algo == "djkstra")
+                this.dijikstra();
         }
     }
 
@@ -200,6 +208,39 @@ class Mazecontainer_1 extends Component {
             for(var j = 0 ; j < 100 ; j++) 
                 this.state.visited[i+"_"+j] = 0;
         }
+    }
+
+    dijikstra() {
+        this.state.stack = [];
+        this.state.stack.push(this.state.start);
+        this.state.visited = {};
+        this.pre_algo();
+        this.setState({running: true} , () => {this.dijikstraNextStep()});
+    }
+
+    dijikstraNextStep() {
+        var temp_array = [];
+        while(this.state.stack.length != 0) {
+            var temp = this.state.stack[this.state.stack.length - 1];
+            this.state.stack.pop();
+            var x = temp.x , y = temp.y;
+            this.state.visited[x + "_" + y] = 1;
+            document.getElementById(x + "_" + y).className = "green-grid-1"
+            if(x == this.state.end.x && y == this.state.end.y) {
+                this.setState({running: false});
+                return;
+            }
+            if(this.state.matrix[x+1][y] == 0 && this.state.visited[(x+1)+"_"+y] === 0) 
+                temp_array.push({x:x+1 , y:y});
+            if(this.state.matrix[x-1][y] == 0 && this.state.visited[(x-1)+"_"+y] === 0) 
+                temp_array.push({x:x-1 , y:y});
+            if(this.state.matrix[x][y+1] == 0 && this.state.visited[(x)+"_"+(y+1)] === 0) 
+                temp_array.push({x:x , y:y+1});
+            if(this.state.matrix[x][y-1] == 0 && this.state.visited[(x)+"_"+(y-1)] === 0) 
+                temp_array.push({x:x , y:y-1});
+        }
+        this.state.stack = temp_array;
+        setTimeout(() => {this.dijikstraNextStep()} , this.state.tsp);
     }
 
     Astar(algo) {
@@ -212,14 +253,14 @@ class Mazecontainer_1 extends Component {
             var cost=((this.state.start.x-this.state.end.x)*(this.state.start.x-this.state.end.x))+((this.state.start.y-this.state.end.y)*(this.state.start.y-this.state.end.y));
         this.state.heap.push({cost: cost,x: this.state.start.x,y: this.state.start.y});
         this.pre_algo();
-        this.AstarNextStep();
+        this.setState({running: true} , () => {this.AstarNextStep(algo)});
     }
 
     AstarNextStep(algo) {
         var temp = this.state.heap.pop();
-        console.log(temp);
         if(temp.x === this.state.end.x && temp.y === this.state.end.y) {
             this.state.heap = [];
+            this.setState({running: false});
             return;
         }
         document.getElementById(temp.x + "_" + temp.y).className = "green-grid-1";
@@ -280,7 +321,6 @@ class Mazecontainer_1 extends Component {
         
         if(temp.x == this.state.end.x && temp.y == this.state.end.y) {
             document.getElementById(temp.x+"_"+temp.y).className = "green-grid-1";
-            console.log("Here");
             this.setState({running: false});
             return;
         }
@@ -477,11 +517,6 @@ class Mazecontainer_1 extends Component {
         }
     }
 
-    handlerRadio(event) {
-        this.state.selected_algo = event.target.value;
-        console.log(this.state.selected_algo);
-    }
-
     render() {
         console.log(this.state.startClicked+" "+this.state.endClicked);
         return (
@@ -498,6 +533,11 @@ class Mazecontainer_1 extends Component {
             
            
            </Draggable>
+
+            <div id = "suggetion_box" style = {{position : "fixed" , height : "26px" , width : "280px" , top : "13%" , left : "5%" , backgroundColor : "rgba(0, 0, 0, 0.2)" , color : "green" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
+                Best Algorithm for Maze: {this.state.best_algo}
+            </div>
+
             <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "90%" , backgroundColor : "rgba(135, 219, 61, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickStart.bind(this)}>
                 Start
             </div>
