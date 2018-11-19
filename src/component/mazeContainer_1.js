@@ -191,6 +191,7 @@ class Mazecontainer_1 extends Component {
             {
             if(document.getElementById(i+"_"+j).className==="green-grid-1"||document.getElementById(i+"_"+j).className==="red-grid-1")
             document.getElementById(i+"_"+j).className="white-grid-1"
+            this.make_empty(document.getElementById(i+"_"+j));
             }
         }
         if(this.state.start.x)
@@ -392,6 +393,7 @@ class Mazecontainer_1 extends Component {
             {
             if(document.getElementById(i+"_"+j).className==="green-grid-1"||document.getElementById(i+"_"+j).className==="red-grid-1")
             document.getElementById(i+"_"+j).className="white-grid-1"
+            this.make_empty(document.getElementById(i+"_"+j));
             }
         }
         if(this.state.start.x)
@@ -456,6 +458,7 @@ class Mazecontainer_1 extends Component {
             {
             this.state.matrix[i][j]=0;
             document.getElementById(i+"_"+j).className="white-grid-1"
+            this.make_empty(document.getElementById(i+"_"+j));
             }
         }
         
@@ -907,6 +910,14 @@ class Mazecontainer_1 extends Component {
         
         this.setState({iteration: parseInt(e.target.id)})
     }
+    handleLearningSlider(e)
+    {
+        this.setState({learningRate: e.target.value})
+    }
+    handleExploration(e)
+    {
+        this.setState({exploration: e.target.value})
+    }
     render() {
         return (
           <div style={{paddingTop: "50px",paddingLeft: "10px"}}>
@@ -955,8 +966,10 @@ class Mazecontainer_1 extends Component {
             <i className="fa fa-minus-circle fa-6" aria-hidden="true"  onClick={this.zoomOut.bind(this)}></i>
            </div>
             
-            <Draggable>
+            <Draggable
+            handle=".handle">
             <div className="block">
+                <div className="handle">
                 <p className="mb15">Select Algorithm</p>
                 <div className="md-radio md-primary">
                     <label>
@@ -990,7 +1003,9 @@ class Mazecontainer_1 extends Component {
                     
                     
                 </div>
+                
                 <div className="md-radio md-primary">
+                
                     <label>
                         <input type="radio" id="1000" name="it" onChange={this.handlerIteration.bind(this)}/> 
                         <span style={{marginLeft: "10px",paddingLeft: "20px"}}>1000</span>
@@ -1013,7 +1028,11 @@ class Mazecontainer_1 extends Component {
                         <span style={{marginLeft: "10px",paddingLeft: "20px"}}>10000</span>
                     </label>
                 </div>
-                
+                </div>
+                <label for="learning_rate">Learning rate: {this.state.learningRate}</label>
+                <input id="learning_rate" type="range" min="0.01" max="1.0" step="0.01" onChange={this.handleLearningSlider.bind(this)} value={this.state.learningRate}/>
+                <label for="exploration">Exploration rate: {this.state.exploration}</label>
+                <input id="exploration" type="range" min="0.01" max="1.0" step="0.01" onChange={this.handleExploration.bind(this)} value={this.state.exploration}/>
                 <p className="mb15">Custom Maze</p>
                 <div className="md-radio md-primary">
                     <label>
@@ -1037,18 +1056,6 @@ class Mazecontainer_1 extends Component {
                     <label>
                         <input type="radio" id="classic1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
                         <span>Classic Maze</span>
-                    </label>
-                </div>
-                <div className="md-radio md-primary">
-                    <label>
-                        <input type="radio" id="b1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
-                        <span>Bird's eye Maze</span>
-                    </label>
-                </div>
-                <div className="md-radio md-primary">
-                    <label>
-                        <input type="radio" id="v1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
-                        <span>Vortex Maze</span>
                     </label>
                 </div>
                 <div className="md-radio md-primary">
