@@ -226,7 +226,7 @@ class Mazecontainer_1 extends Component {
             if(this.state.selected_algo == "djkstra")
             this.setState({running: true} , () => {this.dijikstra()});
             if(this.state.selected_algo == "q-learning")
-            this.setState({running: true} , () => {this.Q_learn()});
+            this.setState({count: 0} , () => {this.Q_learn()} );
         }
     }
 
