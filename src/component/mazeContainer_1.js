@@ -60,11 +60,11 @@ class Mazecontainer_1 extends Component {
             this.state.matrix.push(temp_mat);
         }
         this.setState({maze: this.state.maze , matrix: this.state.matrix});
-        //////console.log(this.state.matrix);
+        
     }
 
     componentDidMount() {
-        //////console.log("Hi");
+        
         for(var i = 0 ; i < 100 ; i++) {
             this.state.matrix[0][i] = 1;
             this.state.matrix[99][i] = 1;
@@ -75,7 +75,7 @@ class Mazecontainer_1 extends Component {
             document.getElementById(i+"_99").className = "black-grid-1";
             document.getElementById("99_"+i).className = "black-grid-1";
         }
-        //////console.log(this.state.maze);
+        
     }
 
     Change_color(event) {
@@ -100,8 +100,8 @@ class Mazecontainer_1 extends Component {
             mat[th.x][th.y] = 0;
         }
         this.setState({matrix: mat});
-        //////console.log(this.state.start);
-        //////console.log(this.state.end);
+        
+        
     }
     handleMouseMove(event)
     {
@@ -114,12 +114,12 @@ class Mazecontainer_1 extends Component {
             mat[th.x][th.y] = 1;
             /*if(this.state.startClicked === 1) {
                 event.target.className="green-grid-1";
-                //////console.log("Hii");
+                
                this.setState({startClicked: 0 , start: th})
             }
             if(this.state.endClicked === 1) {
                 event.target.className = "red-grid-1";
-                //////console.log("Hii");
+                
                this.setState({endClicked: 0 , end: th});
             }*/
             this.setState({matrix: mat});
@@ -212,12 +212,12 @@ class Mazecontainer_1 extends Component {
         }).then((res) => {
             return res.json();
         }).then((json) => {
-            //////console.log(json);
+            
             document.getElementById("suggetion_box").style.display = "block";
             this.setState({best_algo: json.ans})
         });
         
-        //////console.log(this.state.selected_algo);
+        
         if(this.state.start) {
             if(this.state.selected_algo == "dfs")
                 this.dfs();
@@ -449,7 +449,7 @@ class Mazecontainer_1 extends Component {
 
     handleCustomMaze(e)
     {
-        //////console.log(e.target.id);
+        
         for(var i=1;i<99;i++)
         {
             for(var j=1;j<99;j++)
@@ -458,7 +458,7 @@ class Mazecontainer_1 extends Component {
             document.getElementById(i+"_"+j).className="white-grid-1"
             }
         }
-        //////console.log(this.state.matrix);
+        
         if(e.target.id==="sam")
         {
             const temp="*******.********.....*.*.....**.***.*.*****.**.*.*.*.....*.**.*.*.*****.*.**.*.........*.****.*********.**.....*.......**.***.*.********.*.*.*.......**.*.*.*******.**...*...*...*.******.*.*.*.*.**...*.*.*.*.*.**.***.***.*.*.**.........*...**********.*****";
@@ -515,7 +515,7 @@ class Mazecontainer_1 extends Component {
             document.getElementById(2+"_"+10).className="green-grid-1"
             document.getElementById(60+"_"+70).className="red-grid-1"
             
-            //////console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 2,y: 10}, end: {x: 60,y: 70}})
      
         }
@@ -543,7 +543,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(1+"_"+16).className="green-grid-1"
             document.getElementById(18+"_"+33).className="red-grid-1"
-            //////console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 16},end: {x: 18,y: 33}})
      
         }
@@ -571,7 +571,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(1+"_"+22).className="green-grid-1"
             document.getElementById(20+"_"+19).className="red-grid-1"
-            //////console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 22},end: {x: 20,y: 19}})
      
         }
@@ -599,7 +599,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(52+"_"+9).className="green-grid-1"
             document.getElementById(52+"_"+35).className="red-grid-1"
-            //////console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 52,y: 9},end: {x: 52,y: 35}})
      
         }
@@ -627,7 +627,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(1+"_"+27).className="green-grid-1"
             document.getElementById(20+"_"+27).className="red-grid-1"
-            //////console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 27},end: {x: 20,y: 27}})
      
         }
@@ -655,7 +655,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(1+"_"+17).className="green-grid-1"
             document.getElementById(7+"_"+33).className="red-grid-1"
-            //////console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 17},end: {x: 7,y: 33}})
      
         }
@@ -841,7 +841,7 @@ class Mazecontainer_1 extends Component {
     }
 
     nextCell(currentCell , nextAction) {
-        //////////console.log(nextAction);
+        
         if(nextAction == 'left')
             return {x: currentCell.x , y: currentCell.y - 1};
         if(nextAction == 'right')
@@ -868,9 +868,9 @@ class Mazecontainer_1 extends Component {
             var best = -10000000000;
             var ans = 'left';
             for(var i = 0 ; i < actions.length ; i++) {
-                ////////console.log(this.state.Q_matrix[input.x][input.y][actions[i]]);
+                
                 if(this.state.Q_matrix[input.x][input.y][actions[i]] > best) {
-                    ////////console.log("Here me")
+                    
                     best = this.state.Q_matrix[input.x][input.y][actions[i]];
                     ans = actions[i];
                 }
@@ -880,18 +880,18 @@ class Mazecontainer_1 extends Component {
     }
 
     iteration() {
-        //console.log("here");
+        
         let result;
         do {
           result = this.next();
         } while (!result.done);
-        ////console.log(this.state.policy);
+        
         
         return result;
     }
 
     isBestPolicy(policy) {
-        //////console.log(policy);
+        
         const lastElement = policy[policy.length - 1];
         if (
           lastElement.x == this.state.end.x && lastElement.y == this.state.end.y &&
@@ -899,12 +899,12 @@ class Mazecontainer_1 extends Component {
             this.state.bestPolicy.length === 0)
         ) {
           this.state.bestPolicy = this.state.policy;
-          console.log('New best policy: with length', this.state.bestPolicy.length);
+          
         }
     }
     handlerIteration(e)
     {
-        console.log(e.target.id+" "+e.target)
+        
         this.setState({iteration: parseInt(e.target.id)})
     }
     render() {
@@ -916,7 +916,7 @@ class Mazecontainer_1 extends Component {
               <Draggable>
             {this.state.running?(<div style = {{position : "fixed"   , top : "87%" ,borderRadius : "50px",backgroundColor : "white",color : "red", left : "50%" , pointerEvents: "none"}} onClick={this.handlerGo.bind(this)} disable={true}>
 
-              <img src="https://media.giphy.com/media/VNzswn7BmdE7m/giphy.gif" width="60px" height="60px"/>
+              <img src="https:media.giphy.com/media/VNzswn7BmdE7m/giphy.gif" width="60px" height="60px"/>
             </div>):(<div style = {{position : "fixed"   , top : "87%" ,borderRadius : "50px",backgroundColor : "white",color : "rgba(135, 219, 61, 0.9)", left : "50%"}} onClick={this.handlerGo.bind(this)}>
               <i className="fas fa-play-circle  fa-5x" ></i>
             </div>)}      
@@ -924,9 +924,10 @@ class Mazecontainer_1 extends Component {
            
            </Draggable>
 
-            <div id = "suggetion_box" style = {{position : "fixed" , height : "26px" , width : "280px" , top : "13%" , left : "5%" , backgroundColor : "rgba(0, 0, 0, 0.2)" , color : "green" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
+            <div id = "suggetion_box" style = {{position : "fixed" , height : "26px" , width : "280px" , top : "9%" , left : "50%" , transform: 'translate(-50% , -50%)' , backgroundColor : "rgba(255, 0, 0, 0.2)" , color : "green" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
                 Best Algorithm for Maze: {this.state.best_algo}
             </div>
+            
             {this.state.selected_algo==="q-learning"
             ?(
             <Draggable>
