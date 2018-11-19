@@ -34,7 +34,11 @@ class Mazecontainer_1 extends Component {
       bestPolicy: [],
       count: 0 ,
       learningRate: 0.5 ,
-      reward_decay: 0.9
+      reward_decay: 0.9 ,
+      dfs_count: 0 ,
+      a_euclid: 0 ,
+      a_man_count: 0 ,
+      diji_count: 0
     };
 }
 
@@ -213,9 +217,8 @@ class Mazecontainer_1 extends Component {
         }).then((res) => {
             return res.json();
         }).then((json) => {
-            
             document.getElementById("suggetion_box").style.display = "block";
-            this.setState({best_algo: json.ans})
+            this.setState({dfs_count: json.dfs ,a_euclid: json.euclid , a_man_count: json.manhatten ,diji_count:json.Dijikstra ,best_algo: json.ans})
         });
         
         
@@ -935,8 +938,12 @@ class Mazecontainer_1 extends Component {
            
            </Draggable>
 
-            <div id = "suggetion_box" style = {{position : "fixed" , height : "26px" , width : "280px" , top : "9%" , left : "50%" , transform: 'translate(-50% , -50%)' , backgroundColor : "rgba(255, 0, 0, 0.2)" , color : "green" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
-                Best Algorithm for Maze: {this.state.best_algo}
+            <div id = "suggetion_box" style = {{position : "fixed" , height : "100px" , width : "280px" , top : "10%" , left : "2%" , backgroundColor : "rgba(255, 0, 0, 0.2)" , color : "red" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
+                DFS                    : {this.state.dfs_count} <br/>
+                A* manhatten           : {this.state.a_man_count} <br/>
+                A* Euclid              : {this.state.a_euclid} <br/>
+                BFS                    : {this.state.diji_count} <br/>
+                Best Algorithm for Maze: {this.state.best_algo} <br/>
             </div>
             
             {this.state.selected_algo==="q-learning"
@@ -992,7 +999,7 @@ class Mazecontainer_1 extends Component {
                 <div className="md-radio md-primary">
                     <label>
                         <input type="radio" id="djkstra"name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
-                        <span>Dijkstra</span>
+                        <span>BFS</span>
                     </label>
                 </div>
                 <div className="md-radio md-primary">
