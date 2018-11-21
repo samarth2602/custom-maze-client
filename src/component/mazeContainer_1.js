@@ -25,7 +25,20 @@ class Mazecontainer_1 extends Component {
       maze: [] ,
       selected_algo: 1 ,
       running: false ,
-      best_algo: ''
+      best_algo: '' ,
+      Q_matrix: [] ,
+      policy: [] ,
+      selectedCell: {x: 0 , y:0} ,
+      exploration: 0.05 ,
+      iteration: 500 ,
+      bestPolicy: [],
+      count: 0 ,
+      learningRate: 0.5 ,
+      reward_decay: 0.9 ,
+      dfs_count: 0 ,
+      a_euclid: 0 ,
+      a_man_count: 0 ,
+      diji_count: 0
     };
 }
 
@@ -39,7 +52,7 @@ class Mazecontainer_1 extends Component {
             var temp = [];
             var temp_mat = [];
             for(var j = 0 ; j < 100 ; j++) {
-                temp.push(<div id={i+"_"+j} key={c} className="col" className="white-grid-1" onMouseDown={this.handleMouseDown.bind(this) }  onMouseUp={this.handleMouseUp.bind(this)}  onMouseMove={this.handleMouseMove.bind(this)} onClick={this.Change_color.bind(this)}/>);
+                temp.push(<div id={i+"_"+j} key={c} style={{fontSize: '5px' , lineHeight : '6px'}} className="col" className="white-grid-1" onMouseDown={this.handleMouseDown.bind(this) }  onMouseUp={this.handleMouseUp.bind(this)}  onMouseMove={this.handleMouseMove.bind(this)} onClick={this.Change_color.bind(this)}/>);
                 temp_mat.push(0);
                 c++;
             }
@@ -51,11 +64,11 @@ class Mazecontainer_1 extends Component {
             this.state.matrix.push(temp_mat);
         }
         this.setState({maze: this.state.maze , matrix: this.state.matrix});
-        console.log(this.state.matrix);
+        
     }
 
     componentDidMount() {
-        console.log("Hi");
+        
         for(var i = 0 ; i < 100 ; i++) {
             this.state.matrix[0][i] = 1;
             this.state.matrix[99][i] = 1;
@@ -66,7 +79,7 @@ class Mazecontainer_1 extends Component {
             document.getElementById(i+"_99").className = "black-grid-1";
             document.getElementById("99_"+i).className = "black-grid-1";
         }
-        console.log(this.state.maze);
+        
     }
 
     Change_color(event) {
@@ -91,8 +104,8 @@ class Mazecontainer_1 extends Component {
             mat[th.x][th.y] = 0;
         }
         this.setState({matrix: mat});
-        console.log(this.state.start);
-        console.log(this.state.end);
+        
+        
     }
     handleMouseMove(event)
     {
@@ -105,12 +118,12 @@ class Mazecontainer_1 extends Component {
             mat[th.x][th.y] = 1;
             /*if(this.state.startClicked === 1) {
                 event.target.className="green-grid-1";
-                console.log("Hii");
+                
                this.setState({startClicked: 0 , start: th})
             }
             if(this.state.endClicked === 1) {
                 event.target.className = "red-grid-1";
-                console.log("Hii");
+                
                this.setState({endClicked: 0 , end: th});
             }*/
             this.setState({matrix: mat});
@@ -171,12 +184,31 @@ class Mazecontainer_1 extends Component {
 
     handlerGo() {
         
+        if(!(this.state.start.x))
+        {
+            alert("Please Draw a Maze or Select custom Maze from menu")
+            return;
+        }
+        for(var i=1;i<99;i++)
+        {
+            for(var j=1;j<99;j++)
+            {
+            if(document.getElementById(i+"_"+j).className==="green-grid-1"||document.getElementById(i+"_"+j).className==="red-grid-1")
+            document.getElementById(i+"_"+j).className="white-grid-1"
+            this.make_empty(document.getElementById(i+"_"+j));
+            }
+        }
+        if(this.state.start.x)
+        {
+        document.getElementById(this.state.start.x+"_"+this.state.start.y).className="green-grid-1"
+        document.getElementById(this.state.end.x+"_"+this.state.end.y).className="red-grid-1"
+        }
         const payLoad = {
             matrix : this.state.matrix ,
             start : this.state.start ,
             end : this.state.end
         }
-        fetch('/api/get_best_algo' , {
+        fetch('api/get_best_algo' , {
             method: 'POST' ,
             body: JSON.stringify(payLoad) ,
             headers: {
@@ -185,21 +217,22 @@ class Mazecontainer_1 extends Component {
         }).then((res) => {
             return res.json();
         }).then((json) => {
-            console.log(json);
             document.getElementById("suggetion_box").style.display = "block";
-            this.setState({best_algo: json.ans})
+            this.setState({dfs_count: json.dfs ,a_euclid: json.euclid , a_man_count: json.manhatten ,diji_count:json.Dijikstra ,best_algo: json.ans})
         });
         
-        console.log(this.state.selected_algo);
+        
         if(this.state.start) {
             if(this.state.selected_algo == "dfs")
                 this.dfs();
             if(this.state.selected_algo == "A-mahatten")
-                this.Astar(0);
+            this.setState({running: true} , () => {this.Astar(0)});
             if(this.state.selected_algo == "A-euclid")
-                this.Astar(1);
+            this.setState({running: true} , () => {this.Astar(1)});
             if(this.state.selected_algo == "djkstra")
-                this.dijikstra();
+            this.setState({running: true} , () => {this.dijikstra()});
+            if(this.state.selected_algo == "q-learning")
+            this.setState({count: 0} , () => {this.Q_learn()} );
         }
     }
 
@@ -363,10 +396,14 @@ class Mazecontainer_1 extends Component {
             {
             if(document.getElementById(i+"_"+j).className==="green-grid-1"||document.getElementById(i+"_"+j).className==="red-grid-1")
             document.getElementById(i+"_"+j).className="white-grid-1"
+            this.make_empty(document.getElementById(i+"_"+j));
             }
         }
+        if(this.state.start.x)
+        {
         document.getElementById(this.state.start.x+"_"+this.state.start.y).className="green-grid-1"
         document.getElementById(this.state.end.x+"_"+this.state.end.y).className="red-grid-1"
+        }
     }
 
 
@@ -417,16 +454,17 @@ class Mazecontainer_1 extends Component {
 
     handleCustomMaze(e)
     {
-        console.log(e.target.id);
+        
         for(var i=1;i<99;i++)
         {
             for(var j=1;j<99;j++)
             {
             this.state.matrix[i][j]=0;
             document.getElementById(i+"_"+j).className="white-grid-1"
+            this.make_empty(document.getElementById(i+"_"+j));
             }
         }
-        console.log(this.state.matrix);
+        
         if(e.target.id==="sam")
         {
             const temp="*******.********.....*.*.....**.***.*.*****.**.*.*.*.....*.**.*.*.*****.*.**.*.........*.****.*********.**.....*.......**.***.*.********.*.*.*.......**.*.*.*******.**...*...*...*.******.*.*.*.*.**...*.*.*.*.*.**.***.***.*.*.**.........*...**********.*****";
@@ -483,7 +521,7 @@ class Mazecontainer_1 extends Component {
             document.getElementById(2+"_"+10).className="green-grid-1"
             document.getElementById(60+"_"+70).className="red-grid-1"
             
-            console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 2,y: 10}, end: {x: 60,y: 70}})
      
         }
@@ -511,7 +549,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(1+"_"+16).className="green-grid-1"
             document.getElementById(18+"_"+33).className="red-grid-1"
-            console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 16},end: {x: 18,y: 33}})
      
         }
@@ -539,7 +577,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(1+"_"+22).className="green-grid-1"
             document.getElementById(20+"_"+19).className="red-grid-1"
-            console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 22},end: {x: 20,y: 19}})
      
         }
@@ -567,7 +605,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(52+"_"+9).className="green-grid-1"
             document.getElementById(52+"_"+35).className="red-grid-1"
-            console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 52,y: 9},end: {x: 52,y: 35}})
      
         }
@@ -595,7 +633,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(1+"_"+27).className="green-grid-1"
             document.getElementById(20+"_"+27).className="red-grid-1"
-            console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 27},end: {x: 20,y: 27}})
      
         }
@@ -623,7 +661,7 @@ class Mazecontainer_1 extends Component {
           
             document.getElementById(1+"_"+17).className="green-grid-1"
             document.getElementById(7+"_"+33).className="red-grid-1"
-            console.log(this.state.matrix);
+            
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 17},end: {x: 7,y: 33}})
      
         }
@@ -648,17 +686,242 @@ class Mazecontainer_1 extends Component {
                     c++;
                 }
             }
-          
-            document.getElementById(1+"_"+18).className="green-grid-1"
-            document.getElementById(1+"_"+21).className="red-grid-1"
-            console.log(this.state.matrix);
+            document.getElementById(1+"_"+18).className="green-grid-1";
+            document.getElementById(1+"_"+21).className="red-grid-1";
             this.setState({matrix: this.state.matrix,start: {x: 1,y: 18},end: {x: 1,y: 21}})
      
         }
     }
 
+    Q_learn() {
+        this.state.Q_matrix = [];
+        for(var i = 0 ; i < 100 ; i++) {
+            var array = [];
+            for(var j = 0 ; j < 100 ; j++) {
+                array.push({up: 0 , down: 0 , left: 0 , right: 0});
+            }
+            this.state.Q_matrix.push(array);
+        }
+        this.state.selectedCell = this.state.start;
+        this.train(this.state.iteration);
+        
+    }
+
+    make_empty(element) {
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+    }
+
+    appending(node) {
+        var arg = node;
+        var apendee_node = document.getElementById(node.x + "_" + node.y);
+        this.make_empty(apendee_node);
+        var up = document.createTextNode('u:' + Math.floor(this.state.Q_matrix[arg.x][arg.y].up));
+        apendee_node.appendChild(up);
+        var temp = document.createElement("br");
+        apendee_node.appendChild(temp);
+        var up = document.createTextNode('d:' + Math.floor(this.state.Q_matrix[arg.x][arg.y].down));
+        apendee_node.appendChild(up);
+        var temp = document.createElement("br");
+        apendee_node.appendChild(temp);
+        var up = document.createTextNode('r:' + Math.floor(this.state.Q_matrix[arg.x][arg.y].right));
+        apendee_node.appendChild(up);
+        var temp = document.createElement("br");
+        apendee_node.appendChild(temp);
+        var up = document.createTextNode('l:' + Math.floor(this.state.Q_matrix[arg.x][arg.y].left));
+        apendee_node.appendChild(up);
+    }
+
+    train(iteration) {
+        if(iteration > 0) {
+            this.setState({count: this.state.count+1})
+            for(var i in this.state.policy) {
+                document.getElementById(this.state.policy[i].x + "_" + this.state.policy[i].y).className = "white-grid-1";
+            }
+            document.getElementById(this.state.start.x+"_"+this.state.start.y).className="green-grid-1";
+            document.getElementById(this.state.end.x+"_"+this.state.end.y).className="red-grid-1" ;
+            if(this.state.policy.length>0)
+            this.isBestPolicy(this.state.policy);
+            this.state.selectedCell = this.state.start;
+            this.state.policy = [];
+            setTimeout(() => {
+                this.train(iteration-1)
+                },30);
+            this.iteration();
+            
+        }
+        else
+        {
+            if(this.state.bestPolicy.length==0)
+            {
+                alert("Please do more iteration to train your maze")
+            }
+            else
+            {
+                for(var k=0;k<this.state.bestPolicy.length;k++)
+                {
+                    document.getElementById(this.state.bestPolicy[k].x+"_"+this.state.bestPolicy[k].y).className="green-grid-1";
+                }
+                this.state.bestPolicy=[];
+                this.setState({running: false})
+            }
+
+        }
+    }
+
+    next() {
+        var q_new;
+        var reward;
+        var done;
+        const currentCell = this.state.selectedCell;
+        document.getElementById(currentCell.x + "_" + currentCell.y).className = "green-grid-1";
+        this.state.policy.push(currentCell);
+        var best_action = this.nextAction(currentCell);
+        var nextCell = this.nextCell(currentCell ,best_action);
+        if(this.state.matrix[nextCell.x][nextCell.y] == 1) {
+            done = true;
+            reward = -1000;
+            q_new = reward;
+        } 
+        else if(nextCell.x == this.state.end.x && nextCell.y == this.state.end.y) {
+            done = true;
+            reward = 1000;
+            q_new = reward;
+            this.state.policy.push(nextCell);
+        }
+        else {
+            if(this.linear_search(this.state.policy , nextCell) != -1) {
+                done = true;
+                reward = -800;
+                q_new = reward;
+            }
+            else {
+                done = false;
+                reward = -1;
+                q_new = reward + (this.state.reward_decay)*(this.max_Q(nextCell));
+            }
+        }
+        if(best_action == 'left')
+            this.state.Q_matrix[currentCell.x][currentCell.y].left = (this.state.Q_matrix[currentCell.x][currentCell.y].left*(1-this.state.learningRate)) + q_new*(this.state.learningRate);
+        if(best_action == 'right')
+            this.state.Q_matrix[currentCell.x][currentCell.y].right = (this.state.Q_matrix[currentCell.x][currentCell.y].right*(1-this.state.learningRate)) + q_new*(this.state.learningRate);
+        if(best_action == 'up')
+            this.state.Q_matrix[currentCell.x][currentCell.y].up = (this.state.Q_matrix[currentCell.x][currentCell.y].up*(1-this.state.learningRate)) + q_new*(this.state.learningRate);
+        if(best_action == 'down')
+            this.state.Q_matrix[currentCell.x][currentCell.y].down = (this.state.Q_matrix[currentCell.x][currentCell.y].down*(1-this.state.learningRate)) + q_new*(this.state.learningRate);
+        var value = {
+            old_state: currentCell,
+            new_state: nextCell,
+            reward,
+            policy: this.state.policy
+        };
+        this.state.selectedCell = nextCell;
+        this.appending(currentCell);
+        return {value , done};
+    }
+
+    linear_search(array , opr) {
+        for(var i = 0 ; i < array.length ; i++) {
+            if(array[i].x == opr.x && array[i].y == opr.y)
+                return i; 
+        }
+        return -1;
+    }
+
+    max_Q(input) {
+        var best = -10000000000;
+        if(this.state.Q_matrix[input.x][input.y].left > best) {
+            best = this.state.Q_matrix[input.x][input.y].left;
+        }
+        if(this.state.Q_matrix[input.x][input.y].right > best) {
+            best = this.state.Q_matrix[input.x][input.y].right;
+        }
+        if(this.state.Q_matrix[input.x][input.y].up > best) {
+            best = this.state.Q_matrix[input.x][input.y].up;
+        }
+        if(this.state.Q_matrix[input.x][input.y].down > best) {
+            best = this.state.Q_matrix[input.x][input.y].down;
+        }
+        return best;
+    }
+
+    nextCell(currentCell , nextAction) {
+        
+        if(nextAction == 'left')
+            return {x: currentCell.x , y: currentCell.y - 1};
+        if(nextAction == 'right')
+            return {x: currentCell.x , y: currentCell.y + 1};
+        if(nextAction == 'up')
+            return {x: currentCell.x - 1, y: currentCell.y};
+        if(nextAction == 'down')
+            return {x: currentCell.x + 1, y: currentCell.y};
+    }
+
+
+
+    nextAction(input) {
+        var ans;
+        var actions = ["left" , "right" , "up" , "down"];
+        if(Math.random() < this.state.exploration) {
+            const actionIndex = Math.floor(Math.random() * actions.length);
+            for(var i = 0 ; i< actions.length ; i++) {
+                if(actionIndex == i) 
+                    ans = actions[i];
+            }
+        }
+        else {
+            var best = -10000000000;
+            var ans = 'left';
+            for(var i = 0 ; i < actions.length ; i++) {
+                
+                if(this.state.Q_matrix[input.x][input.y][actions[i]] > best) {
+                    
+                    best = this.state.Q_matrix[input.x][input.y][actions[i]];
+                    ans = actions[i];
+                }
+            }
+        }
+        return ans;
+    }
+
+    iteration() {
+        
+        let result;
+        do {
+          result = this.next();
+        } while (!result.done);
+        
+        
+        return result;
+    }
+
+    isBestPolicy(policy) {
+        
+        const lastElement = policy[policy.length - 1];
+        if (
+          lastElement.x == this.state.end.x && lastElement.y == this.state.end.y &&
+          (this.state.bestPolicy.length > policy.length ||
+            this.state.bestPolicy.length === 0)
+        ) {
+          this.state.bestPolicy = this.state.policy;
+          
+        }
+    }
+    handlerIteration(e)
+    {
+        
+        this.setState({iteration: parseInt(e.target.id)})
+    }
+    handleLearningSlider(e)
+    {
+        this.setState({learningRate: e.target.value})
+    }
+    handleExploration(e)
+    {
+        this.setState({exploration: e.target.value})
+    }
     render() {
-        console.log(this.state.startClicked+" "+this.state.endClicked);
         return (
           <div style={{paddingTop: "50px",paddingLeft: "10px"}}>
               {this.state.maze.map(it => {
@@ -667,7 +930,7 @@ class Mazecontainer_1 extends Component {
               <Draggable>
             {this.state.running?(<div style = {{position : "fixed"   , top : "87%" ,borderRadius : "50px",backgroundColor : "white",color : "red", left : "50%" , pointerEvents: "none"}} onClick={this.handlerGo.bind(this)} disable={true}>
 
-              <img src="https://media.giphy.com/media/VNzswn7BmdE7m/giphy.gif" width="60px" height="60px"/>
+              <img src="https:media.giphy.com/media/VNzswn7BmdE7m/giphy.gif" width="60px" height="60px"/>
             </div>):(<div style = {{position : "fixed"   , top : "87%" ,borderRadius : "50px",backgroundColor : "white",color : "rgba(135, 219, 61, 0.9)", left : "50%"}} onClick={this.handlerGo.bind(this)}>
               <i className="fas fa-play-circle  fa-5x" ></i>
             </div>)}      
@@ -675,17 +938,28 @@ class Mazecontainer_1 extends Component {
            
            </Draggable>
 
-            <div id = "suggetion_box" style = {{position : "fixed" , height : "26px" , width : "280px" , top : "13%" , left : "5%" , backgroundColor : "rgba(0, 0, 0, 0.2)" , color : "green" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
-                Best Algorithm for Maze: {this.state.best_algo}
+            <div id = "suggetion_box" style = {{position : "fixed" , height : "100px" , width : "280px" , top : "10%" , left : "2%" , backgroundColor : "rgba(255, 0, 0, 0.2)" , color : "red" , fontWeight: "bold" , padding: "2px" , display: "none"}} >
+                DFS                    : {this.state.dfs_count} <br/>
+                A* manhatten           : {this.state.a_man_count} <br/>
+                A* Euclid              : {this.state.a_euclid} <br/>
+                BFS                    : {this.state.diji_count} <br/>
+                Best Algorithm for Maze: {this.state.best_algo} <br/>
             </div>
-
-            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "90%" , backgroundColor : "rgba(135, 219, 61, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickStart.bind(this)}>
+            
+            {this.state.selected_algo==="q-learning"
+            ?(
+            <Draggable>
+            <div id= "count" style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "50%" , left : "75%" , backgroundColor : "rgba(135, 219, 61, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickStart.bind(this)}>
+                {this.state.count}
+            </div>
+            </Draggable>):null}
+            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "80%" , backgroundColor : "rgba(135, 219, 61, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickStart.bind(this)}>
                 Start
             </div>
-            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "95%" , backgroundColor : "rgba(209, 125, 51, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickEnd.bind(this)}>
+            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "75%" , backgroundColor : "rgba(209, 125, 51, 0.9)" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.onClickEnd.bind(this)}>
                 End
             </div>
-            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "85%" , backgroundColor : "red" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.handleClear.bind(this)}>
+            <div style = {{position : "fixed" , height : "50px" , width : "50px" , borderRadius : "50px" , top : "90%" , left : "70%" , backgroundColor : "red" , color : "white" , textAlign: "center" , lineHeight: "50px" , fontWeight: "bold"}} onClick={this.handleClear.bind(this)}>
                 Clear
             </div>
             <div style = {{position : "fixed" ,top: "90%" ,right: "88%"}}>
@@ -699,8 +973,10 @@ class Mazecontainer_1 extends Component {
             <i className="fa fa-minus-circle fa-6" aria-hidden="true"  onClick={this.zoomOut.bind(this)}></i>
            </div>
             
-            <Draggable>
+            <Draggable
+            handle=".handle">
             <div className="block">
+                <div className="handle">
                 <p className="mb15">Select Algorithm</p>
                 <div className="md-radio md-primary">
                     <label>
@@ -723,21 +999,47 @@ class Mazecontainer_1 extends Component {
                 <div className="md-radio md-primary">
                     <label>
                         <input type="radio" id="djkstra"name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
-                        <span>Dijkstra</span>
+                        <span>BFS</span>
                     </label>
                 </div>
                 <div className="md-radio md-primary">
                     <label>
-                        <input type="radio" id="ida" name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
-                        <span>IDA*</span>
+                        <input type="radio" id="q-learning" name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
+                        <span>Q-Learning</span>
                     </label>
+                    
+                    
                 </div>
+                
                 <div className="md-radio md-primary">
+                
                     <label>
-                        <input type="radio" id="best" name="algo" onChange={this.handleAlgorithm.bind(this)}/> 
-                        <span>Best-First-Search</span>
+                        <input type="radio" id="1000" name="it" onChange={this.handlerIteration.bind(this)}/> 
+                        <span style={{marginLeft: "10px",paddingLeft: "20px"}}>1000</span>
+                    </label>
+                    <label>
+                        <input type="radio" id="2000" name="it" onChange={this.handlerIteration.bind(this)}/> 
+                        <span style={{marginLeft: "10px",paddingLeft: "20px"}}>2000</span>
+                    </label>
+                    
+                    <label>
+                        <input type="radio" id="5000" name="it" onChange={this.handlerIteration.bind(this)}/> 
+                        <span style={{marginLeft: "10px",paddingLeft: "20px"}}>5000</span>
+                    </label>
+                    <label>
+                        <input type="radio" id="500" name="it" onChange={this.handlerIteration.bind(this)}/> 
+                        <span style={{marginLeft: "10px",paddingLeft: "20px"}}>500</span>
+                    </label>
+                    <label>
+                        <input type="radio" id="10000" name="it" onChange={this.handlerIteration.bind(this)}/> 
+                        <span style={{marginLeft: "10px",paddingLeft: "20px"}}>10000</span>
                     </label>
                 </div>
+                </div>
+                <label for="learning_rate">Learning rate: {this.state.learningRate}</label>
+                <input id="learning_rate" type="range" min="0.01" max="1.0" step="0.01" onChange={this.handleLearningSlider.bind(this)} value={this.state.learningRate}/>
+                <label for="exploration">Exploration rate: {this.state.exploration}</label>
+                <input id="exploration" type="range" min="0.01" max="1.0" step="0.01" onChange={this.handleExploration.bind(this)} value={this.state.exploration}/>
                 <p className="mb15">Custom Maze</p>
                 <div className="md-radio md-primary">
                     <label>
@@ -761,18 +1063,6 @@ class Mazecontainer_1 extends Component {
                     <label>
                         <input type="radio" id="classic1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
                         <span>Classic Maze</span>
-                    </label>
-                </div>
-                <div className="md-radio md-primary">
-                    <label>
-                        <input type="radio" id="b1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
-                        <span>Bird's eye Maze</span>
-                    </label>
-                </div>
-                <div className="md-radio md-primary">
-                    <label>
-                        <input type="radio" id="v1" name="maze" onChange={this.handleCustomMaze.bind(this)} /> 
-                        <span>Vortex Maze</span>
                     </label>
                 </div>
                 <div className="md-radio md-primary">

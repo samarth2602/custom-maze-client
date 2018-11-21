@@ -13,10 +13,8 @@ class Maze extends Component {
   render() {
     return (
       <div className="">
-      
-          <Header />
-      
-        <Mazecontainer_1 /> 
+        <Header />
+        {this.props.children}
       </div>
     );
   }

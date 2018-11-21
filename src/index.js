@@ -1,7 +1,22 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
-import Maze from './component/maze';
+import React, { Component } from 'react';
+import maze from './component/maze'
+import { Router,Route,browserHistory,IndexRoute } from "react-router"
 import registerServiceWorker from './registerServiceWorker';
+import Mazecontainer from './component/mazecontainer';
+import Mazecontainer_1 from './component/mazeContainer_1';
 
-ReactDOM.render(<Maze />, document.getElementById('root'));
+class Root extends Component {
+    render() {
+      return (
+       <Router history={browserHistory}>
+            <Route path="/" component={maze}>
+            <Route path="maze-problem" component={Mazecontainer}/>
+            <IndexRoute component={Mazecontainer_1}/>
+            </Route>
+      </Router>
+      );
+    }
+  }
+ReactDOM.render(<Root />, document.getElementById('root'));
 registerServiceWorker();
